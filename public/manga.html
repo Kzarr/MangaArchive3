@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Capítulos do Mangá</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header id="manga-title">Mangá</header>
+  <main>
+    <ul id="chapters" role="list" aria-label="Lista de capítulos"></ul>
+    <a href="index.html" class="back-button" role="button">⬅ Voltar ao Catálogo</a>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    if (!id) {
+      document.getElementById('chapters').innerHTML = '<p>Parâmetro de mangá ausente.</p>';
+      throw new Error('ID do mangá ausente');
+    }
+
+    fetch(`/api/manga/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Mangá não encontrado');
+        return res.json();
+      })
+      .then(manga => {
+        document.getElementById('manga-title').textContent = manga.title || 'Mangá';
+        const list = document.getElementById('chapters');
+        if (!Array.isArray(manga.chapters) || manga.chapters.length === 0) {
+          list.innerHTML = '<p>Nenhum capítulo disponível.</p>';
+          return;
+        }
+        manga.chapters.forEach(chapter => {
+          const li = document.createElement('li');
+          li.textContent = `Capítulo ${chapter.number} - ${chapter.title || ''}`;
+          li.tabIndex = 0;
+          li.role = 'button';
+          li.style.cursor = 'pointer';
+          li.onclick = () => window.location.href = `/chapter.html?id=${id}&num=${chapter.number}`;
+          li.onkeydown = (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+              ev.preventDefault();
+              li.click();
+            }
+          };
+          list.appendChild(li);
+        });
+      })
+      .catch(err => {
+        document.getElementById('chapters').innerHTML = '<p>Erro ao carregar capítulos.</p>';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>

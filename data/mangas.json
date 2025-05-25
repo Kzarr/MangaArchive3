@@ -1,0 +1,30 @@
+[
+  {
+    "id": "naruto",
+    "title": "Naruto",
+    "chapters": [
+      {
+        "number": 1,
+        "title": "O Início",
+        "images": [
+          "/chapters/naruto/1/1.jpg",
+          "/chapters/naruto/1/2.jpg"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "onepiece",
+    "title": "One Piece",
+    "chapters": [
+      {
+        "number": 1,
+        "title": "Romance Dawn",
+        "images": [
+          "/chapters/onepiece/1/1.jpg",
+          "/chapters/onepiece/1/2.jpg"
+        ]
+      }
+    ]
+  }
+]

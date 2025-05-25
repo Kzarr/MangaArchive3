@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Catálogo de Mangás</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>Catálogo de Mangás</header>
+  <main>
+    <input type="text" id="search" placeholder="Buscar mangás..." autocomplete="off" />
+    <ul id="results" role="listbox" aria-label="Resultados da busca"></ul>
+  </main>
+
+  <script>
+    document.getElementById('search').addEventListener('input', async (e) => {
+      const query = e.target.value.trim();
+      const results = document.getElementById('results');
+      if (!query) {
+        results.innerHTML = '';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const mangas = await res.json();
+        results.innerHTML = '';
+        mangas.forEach(m => {
+          const li = document.createElement('li');
+          li.textContent = m.title;
+          li.tabIndex = 0;
+          li.role = 'option';
+          li.onclick = () => window.location.href = `/manga.html?id=${m.id}`;
+          li.onkeydown = (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+              ev.preventDefault();
+              li.click();
+            }
+          };
+          results.appendChild(li);
+        });
+      } catch (error) {
+        results.innerHTML = '<p>Erro ao buscar mangás.</p>';
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>

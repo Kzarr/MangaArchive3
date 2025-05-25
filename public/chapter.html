@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leitor de Mangá</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>Leitor de Mangá</header>
+  <main>
+    <div id="images" aria-live="polite" aria-label="Páginas do capítulo"></div>
+    <a href="javascript:history.back()" class="back-button" role="button">⬅ Voltar</a>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const num = params.get('num');
+
+    if (!id || !num) {
+      document.getElementById('images').innerHTML = '<p>Parâmetros inválidos.</p>';
+      throw new Error('Parâmetros ausentes ou inválidos');
+    }
+
+    fetch(`/api/manga/${id}/chapter/${num}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Capítulo não encontrado');
+        return res.json();
+      })
+      .then(data => {
+        const container = document.getElementById('images');
+        if (!data.images || !Array.isArray(data.images) || data.images.length === 0) {
+          container.innerHTML = '<p>Nenhuma imagem encontrada.</p>';
+          return;
+        }
+        container.innerHTML = '';
+        data.images.forEach(src => {
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = `Página do capítulo ${num}`;
+          container.appendChild(img);
+        });
+      })
+      .catch(err => {
+        document.getElementById('images').innerHTML = `<p>Erro ao carregar o capítulo: ${err.message}</p>`;
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
