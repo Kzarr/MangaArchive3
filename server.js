@@ -1,22 +1,31 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const app = express();
-const PORT = 3000;
+const cors = require('cors');
 
+const app = express();
+
+// Define a porta automaticamente no ambiente do Render ou localmente
+const PORT = process.env.PORT || 3000;
+
+// Evita exposição de headers sensíveis
+app.disable('x-powered-by');
+
+// Configura CORS (permite todas origens em produção simples, ou personalize com env)
+app.use(cors());
+
+// Serve arquivos estáticos da pasta "public"
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// Importa rotas
+// Importa rotas (opcionalmente você pode manter tudo aqui mesmo)
 const mangaRoutes = require('./routes/mangaRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 
 app.use('/api/manga', mangaRoutes);
 app.use('/api/search', searchRoutes);
 
-app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
-
-// Importa lista de mangás
+// Importa lista de mangás (servida localmente por enquanto)
 const mangas = require('./data/mangas.json');
 
 // Buscar mangás por nome
@@ -34,7 +43,7 @@ app.get('/api/manga/:id', (req, res) => {
   res.json(manga);
 });
 
-// Imagens do capítulo - lendo direto da pasta pública
+// Imagens do capítulo
 app.get('/api/manga/:id/chapter/:num', (req, res) => {
   const { id, num } = req.params;
   const dirPath = path.join(__dirname, 'public', 'chapters', id, num);
@@ -57,4 +66,7 @@ app.get('/api/manga/:id/chapter/:num', (req, res) => {
   });
 });
 
-app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
+// Roda o servidor
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta http://localhost:${PORT}`);
+});
